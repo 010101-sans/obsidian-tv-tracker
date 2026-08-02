@@ -1,23 +1,31 @@
 // Renderer.ts
 import { TrackerData } from "./types";
 import { MarkdownPostProcessorContext } from "obsidian";
-import { TvTrackerSettings } from "./settings"; // 👈 Import the interface
+import { TvTrackerSettings } from "./settings";
 
 export function renderTracker(
     el: HTMLElement, 
     data: TrackerData, 
     ctx: MarkdownPostProcessorContext,
-    settings: TvTrackerSettings, // 👈 Accept settings as a parameter
-    onUpdate: (groupIndex: number, episode: number) => void
+    settings: TvTrackerSettings,
+    // Update signature to pass the container back for UI locking
+    onUpdate: (groupIndex: number, episode: number, container: HTMLElement) => void 
 ) {
     let maxEpisodes = 0;
+    let hasGhostData = false;
+
     data.groups.forEach(group => {
         if (group.totalEpisodes > maxEpisodes) maxEpisodes = group.totalEpisodes;
+        
+        // Check for ghost data
+        const outOfBounds = group.watchedEpisodes.filter(ep => ep > group.totalEpisodes);
+        if (outOfBounds.length > 0) hasGhostData = true;
     });
 
     const container = el.createEl("div", { cls: "tv-tracker-container" });
     const table = container.createEl("table", { cls: "tv-tracker-table" });
 
+    // Header
     const thead = table.createEl("thead");
     const headerRow = thead.createEl("tr");
     headerRow.createEl("th", { text: "Ep", cls: "tv-tracker-ep-col" });
@@ -25,12 +33,20 @@ export function renderTracker(
     data.groups.forEach(group => {
         const th = headerRow.createEl("th");
         th.createSpan({ text: group.title });
+        
+        // Add progress text (e.g., "12/24")
+        const watchedCount = group.watchedEpisodes.length;
+        th.createEl("div", { 
+            text: `(${watchedCount}/${group.totalEpisodes})`, 
+            cls: "tv-tracker-progress" 
+        });
+
         if (group.type && group.type !== "season") {
-            th.createEl("br");
             th.createSpan({ text: group.type, cls: "tv-tracker-badge" });
         }
     });
 
+    // Body
     const tbody = table.createEl("tbody");
 
     for (let ep = 1; ep <= maxEpisodes; ep++) {
@@ -44,7 +60,6 @@ export function renderTracker(
                 const isWatched = group.watchedEpisodes.includes(ep);
                 const isSkipped = group.skippedEpisodes?.includes(ep);
                 
-                // 👈 Use the customizable settings here!
                 let boxText = settings.unwatchedEmoji; 
                 if (isWatched) boxText = settings.watchedEmoji;
                 if (isSkipped) boxText = settings.skippedEmoji;
@@ -55,11 +70,18 @@ export function renderTracker(
                 });
                 
                 box.addEventListener("click", () => {
-                    onUpdate(groupIndex, ep);
+                    // Pass the container back so main.ts can lock it
+                    onUpdate(groupIndex, ep, container);
                 });
             } else {
                 td.createEl("span", { text: "-", cls: "tv-tracker-empty" });
             }
         });
+    }
+
+    // Render Ghost Data Warning if detected
+    if (hasGhostData) {
+        const warning = container.createEl("div", { cls: "tv-tracker-warning" });
+        warning.setText("⚠️ Ghost data detected! Some watched episodes exceed the total episode count for their season. Please check your JSON data block in source mode.");
     }
 }

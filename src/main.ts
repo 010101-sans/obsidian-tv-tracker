@@ -5,15 +5,12 @@ import { renderTracker } from './Renderer';
 import { TvTrackerSettings, DEFAULT_SETTINGS, TvTrackerSettingTab } from './settings';
 
 export default class TvTrackerPlugin extends Plugin {
-    settings!: TvTrackerSettings; // 👈 Add settings property
+    settings!: TvTrackerSettings; 
+    private isSaving = false; // Add the lock flag
     
     async onload() {
         console.log("Loading TV & Media Tracker plugin");
-        
-        // Load settings on startup
         await this.loadSettings();
-        
-        // Register the settings tab UI
         this.addSettingTab(new TvTrackerSettingTab(this.app, this));
 
         this.registerMarkdownCodeBlockProcessor("tv-tracker", (source, el, ctx) => {
@@ -42,9 +39,19 @@ export default class TvTrackerPlugin extends Plugin {
             return;
         }
 
-        // 👈 Pass this.settings into the renderer
-        renderTracker(el, data, ctx, this.settings, async (groupIndex, episode) => {
+        renderTracker(el, data, ctx, this.settings, async (groupIndex, episode, container) => {
+            // Prevent overlapping saves
+            if (this.isSaving) return; 
+            
+            this.isSaving = true;
+            
+            // Visually disable the table so the user knows it's processing
+            container.style.opacity = "0.6";
+            container.style.pointerEvents = "none";
+
             await this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode);
+            
+            this.isSaving = false;
         });
     }
 
@@ -58,10 +65,15 @@ export default class TvTrackerPlugin extends Plugin {
         const group = data.groups[groupIndex];
         if (!group) return;
 
+        // Toggle state logic
         const watchIndex = group.watchedEpisodes.indexOf(episode);
         if (watchIndex > -1) {
             group.watchedEpisodes.splice(watchIndex, 1);
         } else {
+            // If it was skipped, we should probably remove it from skipped when watching
+            const skipIndex = group.skippedEpisodes?.indexOf(episode) ?? -1;
+            if (skipIndex > -1) group.skippedEpisodes!.splice(skipIndex, 1);
+            
             group.watchedEpisodes.push(episode);
             group.watchedEpisodes.sort((a, b) => a - b);
         }

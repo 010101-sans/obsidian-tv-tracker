@@ -10,6 +10,7 @@ If your plugin does not need CSS, delete this file.
 .tv-tracker-container {
     margin: 1em 0;
     overflow-x: auto; /* Allows scrolling if there are many seasons */
+    transition: opacity 0.2s ease; /* Smooth fade when locking UI */
 }
 
 .tv-tracker-table {
@@ -66,4 +67,24 @@ If your plugin does not need CSS, delete this file.
     border-radius: 4px;
     display: inline-block;
     margin-top: 4px;
+}
+
+/* some more additions */
+
+.tv-tracker-progress {
+    font-size: 0.8em;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-weight: normal;
+}
+
+.tv-tracker-warning {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: var(--background-modifier-error);
+    color: var(--text-error);
+    border: 1px solid var(--text-error);
+    border-radius: 4px;
+    font-size: 0.9em;
+    text-align: center;
 }
