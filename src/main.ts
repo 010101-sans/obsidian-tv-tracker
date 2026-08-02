@@ -1,22 +1,46 @@
 // main.ts
-import { Plugin, MarkdownPostProcessorContext, TFile } from 'obsidian';
+import { Plugin, MarkdownPostProcessorContext, TFile, Editor, MarkdownView } from 'obsidian';
 import { parseTrackerData } from './dataParser';
 import { renderTracker } from './Renderer';
 import { TvTrackerSettings, DEFAULT_SETTINGS, TvTrackerSettingTab } from './settings';
+import { InsertTrackerModal } from './InsertTrackerModal';
 
 export default class TvTrackerPlugin extends Plugin {
 	settings!: TvTrackerSettings;
 	private isSaving = false; // Add the lock flag
 
 	async onload() {
-		console.log("Loading TV & Media Tracker plugin");
-		await this.loadSettings();
-		this.addSettingTab(new TvTrackerSettingTab(this.app, this));
+        console.log("Loading TV & Media Tracker plugin");
+        
+        // Load user settings on startup
+        await this.loadSettings();
+        
+        // Register the settings tab UI
+        this.addSettingTab(new TvTrackerSettingTab(this.app, this));
 
-		this.registerMarkdownCodeBlockProcessor("tv-tracker", (source, el, ctx) => {
-			this.processTrackerBlock(source, el, ctx);
-		});
-	}
+        // Register the Command Palette action
+        this.addCommand({
+            id: 'insert-tv-tracker',
+            name: 'Insert TV Tracker Table',
+            hotkeys: [{ modifiers: ["Alt"], key: "t" }],
+            editorCallback: (editor, view) => { 
+                // Using inferred types (editor, view) fixes the MarkdownFileInfo error
+                new InsertTrackerModal(this.app, (data) => {
+                    // Generate the JSON block
+                    const jsonString = JSON.stringify(data, null, 2);
+                    const codeBlock = `\`\`\`tv-tracker\n${jsonString}\n\`\`\`\n`;
+                    
+                    // Insert directly at the user's current cursor position
+                    editor.replaceSelection(codeBlock);
+                }).open();
+            }
+        });
+
+        // Register the code block renderer
+        this.registerMarkdownCodeBlockProcessor("tv-tracker", (source, el, ctx) => {
+            this.processTrackerBlock(source, el, ctx);
+        });
+    }
 
 	onunload() {
 		console.log("Unloading TV & Media Tracker plugin");
