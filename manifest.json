@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-tv-tracker",
+	"name": "TV & Media Tracker",
+	"version": "1.0.0",
+	"minAppVersion": "1.5.0",
+	"description": "Create beautiful, interactive grid trackers for TV series, anime, and movies.",
+	"author": "010101-sans",
+	"authorUrl": "https://010101-sans.is-a.dev",
+	"isDesktopOnly": false
+}
