@@ -3,63 +3,48 @@ import { TrackerData } from "./types";
 import { MarkdownPostProcessorContext } from "obsidian";
 
 export function renderTracker(el: HTMLElement, data: TrackerData, ctx: MarkdownPostProcessorContext) {
-    // 1. Find the maximum number of episodes to determine our row count
-    let maxEpisodes = 0;
-    for (const col of data.columns) {
-        if (!col) continue; // TypeScript safety check
-        if (col.totalEpisodes > maxEpisodes) {
-            maxEpisodes = col.totalEpisodes;
-        }
-    }
+    // 1. Create the main Flexbox container
+    const container = el.createEl("div", { cls: "tv-tracker-flex-container" });
 
-    // 2. Build the table containers
-    const container = el.createEl("div", { cls: "tv-tracker-container" });
-    const table = container.createEl("table", { cls: "tv-tracker-table" });
-
-    // 3. Build the Header (<th>)
-    const thead = table.createEl("thead");
-    const headerRow = thead.createEl("tr");
-    
-    headerRow.createEl("th", { text: "Ep", cls: "tv-tracker-ep-col" }); // First column header
-
-    for (const col of data.columns) {
-        if (!col) continue; // TypeScript safety check
-        headerRow.createEl("th", { text: col.title }); // Season headers
-    }
-
-    // 4. Build the Body (<tr> and <td>)
-    const tbody = table.createEl("tbody");
-
-    for (let ep = 1; ep <= maxEpisodes; ep++) {
-        const row = tbody.createEl("tr");
+    // 2. Loop through each Media Group to create individual cards
+    data.groups.forEach((group, groupIndex) => {
+        const card = container.createEl("div", { cls: "tv-tracker-card" });
         
-        // Episode Number column
-        row.createEl("td", { text: ep.toString(), cls: "tv-tracker-ep-num" });
-
-        // Season columns
-        for (let colIndex = 0; colIndex < data.columns.length; colIndex++) {
-            const col = data.columns[colIndex];
-            
-            const td = row.createEl("td", { cls: "tv-tracker-cell" });
-
-            if (!col) continue; // TypeScript safety check
-
-            if (ep <= col.totalEpisodes) {
-                // The season has this episode, render a box!
-                const isWatched = col.watchedEpisodes.includes(ep);
-                const box = td.createEl("span", { 
-                    text: isWatched ? "✅" : "⬜",
-                    cls: "tv-tracker-checkbox" 
-                });
-                
-                // Attach hidden data so we know exactly what is clicked later
-                box.dataset.colIndex = colIndex.toString();
-                box.dataset.episode = ep.toString();
-                
-            } else {
-                // The season does not have this episode, render a dash
-                td.createEl("span", { text: "-", cls: "tv-tracker-empty" });
-            }
+        // Card Header
+        const header = card.createEl("div", { cls: "tv-tracker-card-header" });
+        header.createEl("h3", { text: group.title, cls: "tv-tracker-card-title" });
+        
+        if (group.type) {
+            header.createEl("span", { text: group.type, cls: "tv-tracker-badge" });
         }
-    }
+
+        // 3. Create the CSS Grid for episodes
+        const grid = card.createEl("div", { cls: "tv-tracker-grid" });
+
+        // 4. Populate the grid with checkboxes
+        for (let ep = 1; ep <= group.totalEpisodes; ep++) {
+            const isWatched = group.watchedEpisodes.includes(ep);
+            const isSkipped = group.skippedEpisodes?.includes(ep);
+            
+            // Determine visual state
+            let boxText = "⬜"; // Default unwatched
+            if (isWatched) boxText = "✅";
+            if (isSkipped) boxText = "➖";
+
+            const box = grid.createEl("span", { 
+                text: boxText,
+                cls: "tv-tracker-checkbox" 
+            });
+            
+            // Optional: Show custom label or default episode number on hover
+            const label = group.customLabels && group.customLabels[ep - 1] 
+                ? group.customLabels[ep - 1] 
+                : ep.toString();
+            box.title = `Ep ${label}`; 
+            
+            // Attach hidden data for Phase 5 (Click Events)
+            box.dataset.groupIndex = groupIndex.toString();
+            box.dataset.episode = ep.toString();
+        }
+    });
 }

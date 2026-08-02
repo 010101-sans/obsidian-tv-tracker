@@ -7,45 +7,63 @@ If your plugin does not need CSS, delete this file.
 
 */
 
-.tv-tracker-container {
+.tv-tracker-flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
     margin: 1em 0;
-    overflow-x: auto;
 }
 
-.tv-tracker-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-.tv-tracker-table th, 
-.tv-tracker-table td {
+.tv-tracker-card {
+    background-color: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
-    padding: 6px 12px;
+    border-radius: 8px;
+    padding: 1rem;
+    min-width: 250px;
+    flex: 1 1 auto; /* Allows cards to grow and fill empty space */
 }
 
-.tv-tracker-ep-col {
-    width: 40px;
+.tv-tracker-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding-bottom: 0.5rem;
 }
 
-.tv-tracker-ep-num {
-    font-weight: bold;
-    color: var(--text-muted);
+.tv-tracker-card-title {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.tv-tracker-badge {
+    font-size: 0.7em;
+    text-transform: uppercase;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.tv-tracker-grid {
+    display: grid;
+    /* Automatically creates as many columns of 24px as will fit */
+    grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+    gap: 6px;
+    justify-items: center;
 }
 
 .tv-tracker-checkbox {
     cursor: pointer;
     user-select: none;
     transition: transform 0.1s ease;
-    display: inline-block;
-    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
 }
 
-/* Make it pop slightly when hovering */
 .tv-tracker-checkbox:hover {
     transform: scale(1.2);
-}
-
-.tv-tracker-empty {
-    color: var(--text-faint);
 }
