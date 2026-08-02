@@ -6,3 +6,46 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.tv-tracker-container {
+    margin: 1em 0;
+    overflow-x: auto;
+}
+
+.tv-tracker-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.tv-tracker-table th, 
+.tv-tracker-table td {
+    border: 1px solid var(--background-modifier-border);
+    padding: 6px 12px;
+}
+
+.tv-tracker-ep-col {
+    width: 40px;
+}
+
+.tv-tracker-ep-num {
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.tv-tracker-checkbox {
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s ease;
+    display: inline-block;
+    font-size: 1.1em;
+}
+
+/* Make it pop slightly when hovering */
+.tv-tracker-checkbox:hover {
+    transform: scale(1.2);
+}
+
+.tv-tracker-empty {
+    color: var(--text-faint);
+}
