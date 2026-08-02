@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-tv-tracker",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Create beautiful, interactive grid trackers for TV series, anime, and movies.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
