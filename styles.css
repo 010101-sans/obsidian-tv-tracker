@@ -7,63 +7,63 @@ If your plugin does not need CSS, delete this file.
 
 */
 
-.tv-tracker-flex-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+.tv-tracker-container {
     margin: 1em 0;
+    overflow-x: auto; /* Allows scrolling if there are many seasons */
 }
 
-.tv-tracker-card {
-    background-color: var(--background-secondary);
+.tv-tracker-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.tv-tracker-table th, 
+.tv-tracker-table td {
     border: 1px solid var(--background-modifier-border);
-    border-radius: 8px;
-    padding: 1rem;
-    min-width: 250px;
-    flex: 1 1 auto; /* Allows cards to grow and fill empty space */
+    padding: 8px 12px;
 }
 
-.tv-tracker-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--background-modifier-border);
-    padding-bottom: 0.5rem;
+.tv-tracker-table th {
+    background-color: var(--background-secondary);
+    font-weight: 600;
 }
 
-.tv-tracker-card-title {
-    margin: 0;
-    font-size: 1.1em;
+.tv-tracker-ep-col {
+    width: 50px;
 }
 
-.tv-tracker-badge {
-    font-size: 0.7em;
-    text-transform: uppercase;
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-.tv-tracker-grid {
-    display: grid;
-    /* Automatically creates as many columns of 24px as will fit */
-    grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
-    gap: 6px;
-    justify-items: center;
+.tv-tracker-ep-num {
+    font-weight: bold;
+    color: var(--text-muted);
+    background-color: var(--background-secondary);
 }
 
 .tv-tracker-checkbox {
     cursor: pointer;
     user-select: none;
     transition: transform 0.1s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
     font-size: 1.2em;
 }
 
 .tv-tracker-checkbox:hover {
     transform: scale(1.2);
+}
+
+.tv-tracker-empty {
+    color: var(--text-faint);
+    font-weight: bold;
+}
+
+.tv-tracker-badge {
+    font-size: 0.65em;
+    text-transform: uppercase;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 4px;
 }
