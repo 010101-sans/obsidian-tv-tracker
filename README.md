@@ -25,7 +25,7 @@ If you find this plugin helpful, please consider ⭐ starring this repository! I
 ## Workflow & Usage
 
 ### 1. Trigger the Command
-Open the Command Palette `Insert TV Tracker Table` or use your custom hotkey `ALT+D` to initialize a new tracker directly at your cursor.
+Open the Command Palette and search `Insert TV Tracker Table` or use your custom hotkey `ALT+D` to initialize a new tracker directly at your cursor.
 
 ![Trigger Command](docs/screenshots/trigger-command-or-hotkey.jpg)
 
@@ -38,12 +38,10 @@ Use the intuitive wizard to instantly set up your seasons and episode counts. No
 ### 3. Edit on the Fly
 Made a mistake or starting a new season? Use the built-in visual editor to rename columns, change media types, or reorder seasons using drag-and-drop mechanics.
 
-<div align="center">
-  <img src="docs/screenshots/anime-column-edit-demo-1.jpg" width="32%" alt="Edit Demo 1" />
-  <img src="docs/screenshots/anime-column-edit-demo-2.jpg" width="32%" alt="Edit Demo 2" />
-  <img src="docs/screenshots/anime-column-edit-demo-3.jpg" width="32%" alt="Edit Demo 3" />
-</div>
 
+![Edit Demo 1](docs/screenshots/anime-column-edit-demo-1.jpg)
+![Edit Demo 2](docs/screenshots/anime-column-edit-demo-2.jpg)
+![Edit Demo 3](docs/screenshots/anime-column-edit-demo-3.jpg)
 
 
 ## Installation
