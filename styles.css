@@ -52,10 +52,12 @@ If your plugin does not need CSS, delete this file.
 .tv-tracker-table th:first-child,
 .tv-tracker-table td:first-child {
     position: sticky;
-    left: 0;
-    z-index: 2; /* Ensure it stays above scrolling content */
-    background-color: var(--background-primary); /* Needs a solid background to hide scrolling text behind it */
-    border-right: 2px solid var(--background-modifier-border); /* Slightly thicker border to show separation */
+    left: -1px; /* Fixes chromium sub-pixel rendering gap */
+    z-index: 2;
+    background-color: var(--background-primary);
+    border-right: 2px solid var(--background-modifier-border);
+    background-clip: padding-box; /* Prevents background from bleeding out */
+
 }
 
 .tv-tracker-table th:first-child {
@@ -130,4 +132,85 @@ If your plugin does not need CSS, delete this file.
     color: var(--text-muted);
     border-bottom: 1px solid var(--background-modifier-border);
     padding-bottom: 4px;
+}
+
+/* --- MODERN MODAL STYLES (Phase 7 Polish) --- */
+.tv-tracker-modern-modal .tv-tracker-modal-title {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding-bottom: 12px;
+}
+
+.tv-tracker-modal-grid {
+    display: grid;
+    gap: 16px;
+    /* Automatically creates responsive columns */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    margin-bottom: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px; /* Room for scrollbar */
+}
+
+.tv-tracker-modal-card {
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tv-tracker-modal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.tv-tracker-modal-card-header h3 {
+    margin: 0;
+    color: var(--text-normal);
+    font-size: 1.1em;
+}
+
+/* Modify the Obsidian default setting spacing inside cards */
+.tv-tracker-modal-card .setting-item {
+    border: none;
+    padding: 8px 0;
+}
+
+.tv-tracker-modal-card .setting-item-info {
+    flex: 0 1 auto;
+    margin-right: 12px;
+}
+
+.tv-tracker-icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    box-shadow: none;
+    font-size: 1.1em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+.tv-tracker-icon-btn:hover {
+    opacity: 1;
+    background: var(--background-modifier-error-hover);
+    box-shadow: none;
+}
+
+.tv-tracker-modal-footer {
+    padding-top: 16px;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.tv-tracker-modal-footer .setting-item {
+    border: none;
+    padding: 0;
 }

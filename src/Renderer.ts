@@ -8,7 +8,8 @@ export function renderTracker(
     data: TrackerData, 
     ctx: MarkdownPostProcessorContext,
     settings: TvTrackerSettings,
-    // Add isBulkWatch parameter to the callback
+    savedScroll: number, // New
+    onScroll: (scrollLeft: number) => void, // New
     onUpdate: (groupIndex: number, episode: number, container: HTMLElement, isBulkWatch?: boolean) => void,
     onEdit: (currentData: TrackerData) => void 
 ) {
@@ -36,6 +37,17 @@ export function renderTracker(
     const thead = table.createEl("thead");
     const headerRow = thead.createEl("tr");
     headerRow.createEl("th", { text: "Ep", cls: "tv-tracker-ep-col" });
+
+    // Restore scroll position seamlessly
+    setTimeout(() => {
+        if (tableWrapper) tableWrapper.scrollLeft = savedScroll;
+    }, 50);
+
+    // Save scroll position to memory as user scrolls
+    tableWrapper.addEventListener("scroll", () => {
+        onScroll(tableWrapper.scrollLeft);
+    });
+
 
     data.groups.forEach(group => {
         const th = headerRow.createEl("th");
