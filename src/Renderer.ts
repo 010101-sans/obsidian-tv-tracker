@@ -22,13 +22,13 @@ export function renderTracker(
         if (outOfBounds.length > 0) hasGhostData = true;
     });
 
-    const container = el.createEl("div", { cls: "tv-tracker-container" });
+    const container = el.createDiv({ cls: "tv-tracker-container" });
     
-    const headerBar = container.createEl("div", { cls: "tv-tracker-header-bar" });
+    const headerBar = container.createDiv({ cls: "tv-tracker-header-bar" });
     const editBtn = headerBar.createEl("button", { text: "Edit", cls: "tv-tracker-edit-btn" });
     editBtn.addEventListener("click", () => onEdit(data));
 
-    const tableWrapper = container.createEl("div", { cls: "tv-tracker-table-wrapper" });
+    const tableWrapper = container.createDiv({ cls: "tv-tracker-table-wrapper" });
     const table = tableWrapper.createEl("table", { cls: "tv-tracker-table" });
 
     window.setTimeout(() => {
@@ -48,7 +48,7 @@ export function renderTracker(
         th.createSpan({ text: group.title });
         
         const watchedCount = group.watchedEpisodes.length;
-        th.createEl("div", { 
+        th.createDiv({ 
             text: `(${watchedCount}/${group.totalEpisodes})`, 
             cls: "tv-tracker-progress" 
         });
@@ -75,7 +75,7 @@ export function renderTracker(
                 if (isWatched) boxText = settings.watchedEmoji;
                 if (isSkipped) boxText = settings.skippedEmoji;
 
-                const box = td.createEl("span", { 
+                const box = td.createSpan({ 
                     text: boxText,
                     cls: "tv-tracker-checkbox" 
                 });
@@ -101,13 +101,13 @@ export function renderTracker(
                     onUpdate(groupIndex, ep, container, false);
                 });
             } else {
-                td.createEl("span", { text: "-", cls: "tv-tracker-empty" });
+                td.createSpan({ text: "-", cls: "tv-tracker-empty" });
             }
         });
     }
 
     if (hasGhostData) {
-        const warning = container.createEl("div", { cls: "tv-tracker-warning" });
+        const warning = container.createDiv({ cls: "tv-tracker-warning" });
         warning.setText("⚠️ Ghost data detected! Some watched episodes exceed the total episode count for their season.");
     }
 }

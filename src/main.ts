@@ -33,7 +33,8 @@ export default class TvTrackerPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const loadedData = (await this.loadData()) as Partial<TvTrackerSettings> | null;
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
     }
 
     async saveSettings() {
@@ -44,7 +45,7 @@ export default class TvTrackerPlugin extends Plugin {
         const data = parseTrackerData(source);
 
         if (!data) {
-            const errorNode = el.createEl("div", { cls: "tv-tracker-error" });
+            const errorNode = el.createDiv({ cls: "tv-tracker-error" });
             errorNode.setText("⚠️ Invalid TV Tracker Data. Please check your JSON syntax.");
             return;
         }

@@ -22,11 +22,29 @@ export class TvTrackerSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
+    // Supports the declarative settings search in Obsidian 1.13.0+
+    getSettingDefinitions() {
+        return [
+            {
+                name: 'Watched Emoji',
+                control: { type: 'text', key: 'watchedEmoji' }
+            },
+            {
+                name: 'Unwatched Emoji',
+                control: { type: 'text', key: 'unwatchedEmoji' }
+            },
+            {
+                name: 'Skipped Emoji',
+                control: { type: 'text', key: 'skippedEmoji' }
+            }
+        ];
+    }
+
+    // Supports backwards compatibility for Obsidian below 1.13.0
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
 
-        // Fix: Removed the word "Settings" from heading
         new Setting(containerEl)
             .setName("TV & Media Tracker")
             .setHeading();
