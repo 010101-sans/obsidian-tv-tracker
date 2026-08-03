@@ -26,7 +26,7 @@ export function renderTracker(
     
     // Header Bar & Edit Button
     const headerBar = container.createEl("div", { cls: "tv-tracker-header-bar" });
-    const editBtn = headerBar.createEl("button", { text: "⚙️ Edit", cls: "tv-tracker-edit-btn" });
+    const editBtn = headerBar.createEl("button", { text: "Edit", cls: "tv-tracker-edit-btn" });
     editBtn.addEventListener("click", () => onEdit(data));
 
     // Wrap the table in a new div so only the table scrolls horizontally

@@ -77,7 +77,7 @@ export class EditTrackerModal extends Modal {
         
         new Setting(footer)
             .addButton(btn => btn
-                .setButtonText("➕ Add Column")
+                .setButtonText("Add Column")
                 .onClick(() => {
                     this.data.groups.push({
                         title: `Season ${this.data.groups.length + 1}`,
@@ -90,7 +90,7 @@ export class EditTrackerModal extends Modal {
                 })
             )
             .addButton(btn => btn
-                .setButtonText("💾 Save Changes")
+                .setButtonText("Save Changes")
                 .setCta()
                 .onClick(() => {
                     this.close();
