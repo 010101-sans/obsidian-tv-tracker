@@ -10,7 +10,7 @@ Thank you for your interest in contributing to the **TV & Media Tracker**! This 
 ## Local Development Setup
 
 1. Clone the repository into a test vault's plugin folder:
-   `[VaultFolder]/.obsidian/plugins/obsidian-tv-tracker/`
+   `[VaultFolder]/.obsidian/plugins/tv-media-tracker/`
 2. Run `npm install` to install dependencies.
 3. Run `npm run dev` to start the esbuild watcher. This will automatically compile `main.js` whenever you save a TypeScript file.
 4. Reload the Obsidian app (or use a hot-reload plugin) to see your changes.

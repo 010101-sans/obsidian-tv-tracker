@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-tv-tracker",
+	"name": "tv-media-tracker",
 	"version": "1.0.0",
 	"description": "Create beautiful, interactive grid trackers for TV series, anime, and movies.",
 	"main": "main.js",

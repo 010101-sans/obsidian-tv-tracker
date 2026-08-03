@@ -55,7 +55,7 @@ Made a mistake or starting a new season? Use the built-in visual editor to renam
 
 **Manual Installation**
 1. Download the latest `main.js`, `styles.css`, and `manifest.json` from the Releases page.
-2. Place them in a folder named `obsidian-tv-tracker` inside your vault's `.obsidian/plugins/` directory.
+2. Place them in a folder named `tv-media-tracker` inside your vault's `.obsidian/plugins/` directory.
 3. Reload Obsidian and enable the plugin.
 
 ## Documentation
