@@ -18,7 +18,6 @@ export default class TvTrackerPlugin extends Plugin {
         this.addCommand({
             id: 'insert-tv-tracker',
             name: 'Insert TV Tracker Table',
-            // Default hotkeys removed per Obsidian plugin guidelines
             editorCallback: (editor) => { 
                 new InsertTrackerModal(this.app, (data) => {
                     const jsonString = JSON.stringify(data, null, 2);
@@ -66,10 +65,9 @@ export default class TvTrackerPlugin extends Plugin {
                 if (this.isSaving) return; 
                 this.isSaving = true;
                 
-                // Use CSS class instead of direct style assignment
                 container.addClass("tv-tracker-saving");
 
-                this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode, isBulkWatch)
+                void this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode, isBulkWatch)
                     .finally(() => {
                         this.isSaving = false;
                         container.removeClass("tv-tracker-saving");
@@ -82,13 +80,13 @@ export default class TvTrackerPlugin extends Plugin {
                         if (!(file instanceof TFile)) return;
 
                         const newSource = JSON.stringify(updatedData, null, 2);
-                        this.app.vault.read(file).then((fileContent) => {
+                        void this.app.vault.read(file).then((fileContent) => {
                             const newFileContent = fileContent.replace(source, newSource);
-                            this.app.vault.modify(file, newFileContent);
+                            void this.app.vault.modify(file, newFileContent);
                         });
                     }).open();
-                } catch (e) {
-                    // Handled error silently or via UI notification
+                } catch {
+                    // Ignored
                 }
             }
         );

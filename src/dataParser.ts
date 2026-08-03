@@ -23,7 +23,7 @@ export function parseTrackerData(jsonString: string): TrackerData | null {
         });
 
         return { groups };
-    } catch (e) {
+    } catch {
         return null;
     }
 }

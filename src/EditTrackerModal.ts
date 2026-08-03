@@ -1,16 +1,15 @@
-// EditTrackerModal.ts
+// src/EditTrackerModal.ts
 import { App, Modal, Setting } from 'obsidian';
-import { TrackerData } from './types';
+import { TrackerData, MediaType } from './types';
 
 export class EditTrackerModal extends Modal {
     data: TrackerData;
     onSubmit: (data: TrackerData) => void;
-    // Track the index of the item currently being dragged
-    private draggedIndex: number | null = null;
+    private draggedIndex: number | null = null; 
 
     constructor(app: App, currentData: TrackerData, onSubmit: (data: TrackerData) => void) {
         super(app);
-        this.data = JSON.parse(JSON.stringify(currentData));
+        this.data = JSON.parse(JSON.stringify(currentData)) as TrackerData;
         this.onSubmit = onSubmit;
     }
 
@@ -22,29 +21,26 @@ export class EditTrackerModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         contentEl.addClass("tv-tracker-modern-modal");
-
+        
         contentEl.createEl("h2", { text: "Edit Media Tracker", cls: "tv-tracker-modal-title" });
 
-        const grid = contentEl.createEl("div", { cls: "tv-tracker-modal-grid" });
+        const grid = contentEl.createDiv({ cls: "tv-tracker-modal-grid" });
 
         this.data.groups.forEach((group, index) => {
-            const card = grid.createEl("div", { cls: "tv-tracker-modal-card" });
-
-            // 1. Make the card draggable
+            const card = grid.createDiv({ cls: "tv-tracker-modal-card" });
+            
             card.setAttribute("draggable", "true");
 
-            // 2. Drag & Drop Event Listeners
             card.addEventListener("dragstart", (e) => {
                 this.draggedIndex = index;
                 card.addClass("tv-tracker-is-dragging");
-                // Optional: set drag image/data
                 if (e.dataTransfer) {
                     e.dataTransfer.effectAllowed = "move";
                 }
             });
 
             card.addEventListener("dragover", (e) => {
-                e.preventDefault(); // Required to allow a drop
+                e.preventDefault();
                 if (this.draggedIndex === index) return;
                 card.addClass("tv-tracker-drag-over");
             });
@@ -56,20 +52,14 @@ export class EditTrackerModal extends Modal {
             card.addEventListener("drop", (e) => {
                 e.preventDefault();
                 card.removeClass("tv-tracker-drag-over");
-
+                
                 if (this.draggedIndex !== null && this.draggedIndex !== index) {
-                    // Extract the item from the old position
                     const draggedItem = this.data.groups.splice(this.draggedIndex, 1)[0];
-
-                    // Add a safety check to satisfy TypeScript
                     if (draggedItem) {
-                        // Insert it at the new position
                         this.data.groups.splice(index, 0, draggedItem);
                     }
-
-                    // Re-render the modal with the new order
                     this.draggedIndex = null;
-                    this.display();
+                    this.display(); 
                 }
             });
 
@@ -78,21 +68,18 @@ export class EditTrackerModal extends Modal {
                 this.draggedIndex = null;
             });
 
-            // Card Header
-            const header = card.createEl("div", { cls: "tv-tracker-modal-card-header" });
-
-            // Add a visual drag handle
-            const titleContainer = header.createEl("div", { cls: "tv-tracker-card-title-container" });
-            titleContainer.createEl("span", { text: "☰", cls: "tv-tracker-drag-handle" });
+            const header = card.createDiv({ cls: "tv-tracker-modal-card-header" });
+            
+            const titleContainer = header.createDiv({ cls: "tv-tracker-card-title-container" });
+            titleContainer.createSpan({ text: "☰", cls: "tv-tracker-drag-handle" });
             titleContainer.createEl("h3", { text: `Column ${index + 1}` });
-
+            
             const deleteBtn = header.createEl("button", { text: "🗑️", cls: "tv-tracker-icon-btn", title: "Delete Column" });
             deleteBtn.onclick = () => {
                 this.data.groups.splice(index, 1);
-                this.display();
+                this.display(); 
             };
 
-            // Inputs
             new Setting(card)
                 .setName("Title")
                 .addText(text => text
@@ -106,8 +93,8 @@ export class EditTrackerModal extends Modal {
                     .addOption("season", "Season")
                     .addOption("movie", "Movie")
                     .addOption("special", "Special")
-                    .setValue(group.type || "season")
-                    .onChange(value => { group.type = value as any; })
+                    .setValue(group.type || "season") 
+                    .onChange(value => { group.type = value as MediaType; })
                 );
 
             new Setting(card)
@@ -115,7 +102,7 @@ export class EditTrackerModal extends Modal {
                 .addText(text => text
                     .setValue(group.totalEpisodes ? group.totalEpisodes.toString() : "1")
                     .onChange(value => {
-                        const parsed = parseInt(value);
+                        const parsed = parseInt(value, 10);
                         if (!isNaN(parsed) && parsed > 0) {
                             group.totalEpisodes = parsed;
                         }
@@ -123,9 +110,8 @@ export class EditTrackerModal extends Modal {
                 );
         });
 
-        // Sticky Footer Actions
-        const footer = contentEl.createEl("div", { cls: "tv-tracker-modal-footer" });
-
+        const footer = contentEl.createDiv({ cls: "tv-tracker-modal-footer" });
+        
         new Setting(footer)
             .addButton(btn => btn
                 .setButtonText("Add Column")
@@ -137,7 +123,7 @@ export class EditTrackerModal extends Modal {
                         watchedEpisodes: [],
                         skippedEpisodes: []
                     });
-                    this.display();
+                    this.display(); 
                 })
             )
             .addButton(btn => btn
@@ -148,5 +134,9 @@ export class EditTrackerModal extends Modal {
                     this.onSubmit(this.data);
                 })
             );
+    }
+
+    onClose() {
+        this.contentEl.empty();
     }
 }

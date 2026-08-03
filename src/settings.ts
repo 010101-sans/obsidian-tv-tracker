@@ -26,9 +26,9 @@ export class TvTrackerSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        // Fix for heading error
+        // Fix: Removed the word "Settings" from heading
         new Setting(containerEl)
-            .setName("TV & Media Tracker Settings")
+            .setName("TV & Media Tracker")
             .setHeading();
 
         new Setting(containerEl)
