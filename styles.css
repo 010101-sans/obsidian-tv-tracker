@@ -214,3 +214,37 @@ If your plugin does not need CSS, delete this file.
     border: none;
     padding: 0;
 }
+
+/* Drag and Drop Styles */
+.tv-tracker-modal-card[draggable="true"] {
+    cursor: grab;
+}
+
+.tv-tracker-modal-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.tv-tracker-is-dragging {
+    opacity: 0.4;
+    border: 2px dashed var(--interactive-accent) !important;
+}
+
+.tv-tracker-drag-over {
+    transform: scale(1.02);
+    border: 2px solid var(--interactive-accent) !important;
+    background-color: var(--background-modifier-hover);
+    transition: all 0.15s ease;
+}
+
+.tv-tracker-card-title-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tv-tracker-drag-handle {
+    cursor: grab;
+    color: var(--text-muted);
+    font-size: 1.2em;
+    user-select: none;
+}
