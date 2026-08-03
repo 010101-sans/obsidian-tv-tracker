@@ -69,8 +69,6 @@ If your plugin does not need CSS, delete this file.
     margin-top: 4px;
 }
 
-/* some more additions */
-
 .tv-tracker-progress {
     font-size: 0.8em;
     color: var(--text-muted);
@@ -87,4 +85,33 @@ If your plugin does not need CSS, delete this file.
     border-radius: 4px;
     font-size: 0.9em;
     text-align: center;
+}
+
+.tv-tracker-header-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.tv-tracker-edit-btn {
+    background-color: var(--interactive-normal);
+    border: 1px solid var(--background-modifier-border);
+    color: var(--text-normal);
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.15s ease;
+}
+
+.tv-tracker-edit-btn:hover {
+    background-color: var(--interactive-hover);
+}
+
+.tv-tracker-modal-header {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding-bottom: 4px;
 }

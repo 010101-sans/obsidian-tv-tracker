@@ -8,21 +8,27 @@ export function renderTracker(
     data: TrackerData, 
     ctx: MarkdownPostProcessorContext,
     settings: TvTrackerSettings,
-    // Update signature to pass the container back for UI locking
-    onUpdate: (groupIndex: number, episode: number, container: HTMLElement) => void 
+    onUpdate: (groupIndex: number, episode: number, container: HTMLElement) => void,
+    onEdit: (currentData: TrackerData) => void // New callback for the edit button
 ) {
     let maxEpisodes = 0;
     let hasGhostData = false;
 
     data.groups.forEach(group => {
         if (group.totalEpisodes > maxEpisodes) maxEpisodes = group.totalEpisodes;
-        
-        // Check for ghost data
         const outOfBounds = group.watchedEpisodes.filter(ep => ep > group.totalEpisodes);
         if (outOfBounds.length > 0) hasGhostData = true;
     });
 
     const container = el.createEl("div", { cls: "tv-tracker-container" });
+    
+    // Create a header bar for the Edit Button
+    const headerBar = container.createEl("div", { cls: "tv-tracker-header-bar" });
+    const editBtn = headerBar.createEl("button", { text: "⚙️ Edit", cls: "tv-tracker-edit-btn" });
+    editBtn.addEventListener("click", () => {
+        onEdit(data);
+    });
+
     const table = container.createEl("table", { cls: "tv-tracker-table" });
 
     // Header
@@ -34,7 +40,6 @@ export function renderTracker(
         const th = headerRow.createEl("th");
         th.createSpan({ text: group.title });
         
-        // Add progress text (e.g., "12/24")
         const watchedCount = group.watchedEpisodes.length;
         th.createEl("div", { 
             text: `(${watchedCount}/${group.totalEpisodes})`, 
@@ -70,7 +75,6 @@ export function renderTracker(
                 });
                 
                 box.addEventListener("click", () => {
-                    // Pass the container back so main.ts can lock it
                     onUpdate(groupIndex, ep, container);
                 });
             } else {
@@ -79,9 +83,8 @@ export function renderTracker(
         });
     }
 
-    // Render Ghost Data Warning if detected
     if (hasGhostData) {
         const warning = container.createEl("div", { cls: "tv-tracker-warning" });
-        warning.setText("⚠️ Ghost data detected! Some watched episodes exceed the total episode count for their season. Please check your JSON data block in source mode.");
+        warning.setText("⚠️ Ghost data detected! Some watched episodes exceed the total episode count for their season.");
     }
 }

@@ -4,6 +4,7 @@ import { parseTrackerData } from './dataParser';
 import { renderTracker } from './Renderer';
 import { TvTrackerSettings, DEFAULT_SETTINGS, TvTrackerSettingTab } from './settings';
 import { InsertTrackerModal } from './InsertTrackerModal';
+import { EditTrackerModal } from './EditTrackerModal';
 
 export default class TvTrackerPlugin extends Plugin {
 	settings!: TvTrackerSettings;
@@ -55,29 +56,47 @@ export default class TvTrackerPlugin extends Plugin {
 	}
 
 	private processTrackerBlock(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-		const data = parseTrackerData(source);
+        const data = parseTrackerData(source);
 
-		if (!data) {
-			const errorNode = el.createEl("div", { cls: "tv-tracker-error" });
-			errorNode.setText("⚠️ Invalid TV Tracker Data. Please check your JSON syntax.");
-			return;
-		}
+        if (!data) {
+            const errorNode = el.createEl("div", { cls: "tv-tracker-error" });
+            errorNode.setText("⚠️ Invalid TV Tracker Data. Please check your JSON syntax.");
+            return;
+        }
 
-		renderTracker(el, data, ctx, this.settings, async (groupIndex, episode, container) => {
-			// Prevent overlapping saves
-			if (this.isSaving) return;
+        renderTracker(
+            el, 
+            data, 
+            ctx, 
+            this.settings, 
+            async (groupIndex, episode, container) => {
+                if (this.isSaving) return; 
+                this.isSaving = true;
+                
+                container.style.opacity = "0.6";
+                container.style.pointerEvents = "none";
 
-			this.isSaving = true;
+                await this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode);
+                
+                this.isSaving = false;
+            },
+            // The new onEdit callback
+            (currentData) => {
+                new EditTrackerModal(this.app, currentData, async (updatedData) => {
+                    const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
+                    if (!(file instanceof TFile)) return;
 
-			// Visually disable the table so the user knows it's processing
-			container.style.opacity = "0.6";
-			container.style.pointerEvents = "none";
-
-			await this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode);
-
-			this.isSaving = false;
-		});
-	}
+                    // Stringify the newly edited data from the modal
+                    const newSource = JSON.stringify(updatedData, null, 2);
+                    const fileContent = await this.app.vault.read(file);
+                    
+                    // Replace the old JSON block with the new one
+                    const newFileContent = fileContent.replace(source, newSource);
+                    await this.app.vault.modify(file, newFileContent);
+                }).open();
+            }
+        );
+    }
 
 	private async updateVaultFile(originalSource: string, sourcePath: string, groupIndex: number, episode: number) {
 		const file = this.app.vault.getAbstractFileByPath(sourcePath);
