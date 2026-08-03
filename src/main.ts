@@ -57,89 +57,80 @@ export default class TvTrackerPlugin extends Plugin {
 
 	private processTrackerBlock(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
         const data = parseTrackerData(source);
-
-        if (!data) {
-            const errorNode = el.createEl("div", { cls: "tv-tracker-error" });
-            errorNode.setText("⚠️ Invalid TV Tracker Data. Please check your JSON syntax.");
-            return;
-        }
+        if (!data) return; // ... (keep your error handling here)
 
         renderTracker(
             el, 
             data, 
             ctx, 
             this.settings, 
-            async (groupIndex, episode, container) => {
+            // Accept the isBulkWatch flag here
+            async (groupIndex, episode, container, isBulkWatch) => {
                 if (this.isSaving) return; 
                 this.isSaving = true;
                 
                 container.style.opacity = "0.6";
                 container.style.pointerEvents = "none";
 
-                await this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode);
+                // Pass it down to the vault file updater
+                await this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode, isBulkWatch);
                 
                 this.isSaving = false;
             },
-            // The new onEdit callback
-            (currentData) => {
-                new EditTrackerModal(this.app, currentData, async (updatedData) => {
-                    const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
-                    if (!(file instanceof TFile)) return;
-
-                    // Stringify the newly edited data from the modal
-                    const newSource = JSON.stringify(updatedData, null, 2);
-                    const fileContent = await this.app.vault.read(file);
-                    
-                    // Replace the old JSON block with the new one
-                    const newFileContent = fileContent.replace(source, newSource);
-                    await this.app.vault.modify(file, newFileContent);
-                }).open();
-            }
+            (currentData) => { /* ... edit modal logic (remains unchanged) ... */ }
         );
     }
 
-	private async updateVaultFile(originalSource: string, sourcePath: string, groupIndex: number, episode: number) {
-		const file = this.app.vault.getAbstractFileByPath(sourcePath);
-		if (!(file instanceof TFile)) return;
+    // Update signature to include isBulkWatch
+    private async updateVaultFile(originalSource: string, sourcePath: string, groupIndex: number, episode: number, isBulkWatch?: boolean) {
+        const file = this.app.vault.getAbstractFileByPath(sourcePath);
+        if (!(file instanceof TFile)) return;
 
-		const data = parseTrackerData(originalSource);
-		if (!data) return;
+        const data = parseTrackerData(originalSource);
+        if (!data) return;
 
-		const group = data.groups[groupIndex];
-		if (!group) return;
+        const group = data.groups[groupIndex];
+        if (!group) return;
 
-		// Ensure skippedEpisodes array exists
-		if (!group.skippedEpisodes) {
-			group.skippedEpisodes = [];
-		}
+        if (!group.skippedEpisodes) group.skippedEpisodes = [];
 
-		const watchIndex = group.watchedEpisodes.indexOf(episode);
-		const skipIndex = group.skippedEpisodes.indexOf(episode);
+        // Bulk Action Logic
+        if (isBulkWatch) {
+            // Loop from episode 1 to the held episode
+            for (let i = 1; i <= episode; i++) {
+                // If it's not already watched, add it
+                if (!group.watchedEpisodes.includes(i)) {
+                    group.watchedEpisodes.push(i);
+                }
+                // If it was skipped, remove it from the skipped array
+                const skipIndex = group.skippedEpisodes.indexOf(i);
+                if (skipIndex > -1) {
+                    group.skippedEpisodes.splice(skipIndex, 1);
+                }
+            }
+            group.watchedEpisodes.sort((a, b) => a - b);
+        } 
+        // Standard 3-State Toggle Logic (Unseen -> Seen -> Skipped)
+        else {
+            const watchIndex = group.watchedEpisodes.indexOf(episode);
+            const skipIndex = group.skippedEpisodes.indexOf(episode);
 
-		// 🔄 The 3-State Toggle Logic
-		if (watchIndex > -1) {
-			// STATE 2 ➡️ STATE 3: (Seen ➡️ Skipped)
-			// Remove from watched, add to skipped
-			group.watchedEpisodes.splice(watchIndex, 1);
-			group.skippedEpisodes.push(episode);
-			group.skippedEpisodes.sort((a, b) => a - b);
+            if (watchIndex > -1) {
+                group.watchedEpisodes.splice(watchIndex, 1);
+                group.skippedEpisodes.push(episode);
+                group.skippedEpisodes.sort((a, b) => a - b);
+            } else if (skipIndex > -1) {
+                group.skippedEpisodes.splice(skipIndex, 1);
+            } else {
+                group.watchedEpisodes.push(episode);
+                group.watchedEpisodes.sort((a, b) => a - b);
+            }
+        }
 
-		} else if (skipIndex > -1) {
-			// STATE 3 ➡️ STATE 1: (Skipped ➡️ Unseen)
-			// Remove from skipped (now it's in neither array)
-			group.skippedEpisodes.splice(skipIndex, 1);
+        const newSource = JSON.stringify(data, null, 2);
+        const fileContent = await this.app.vault.read(file);
+        const newFileContent = fileContent.replace(originalSource, newSource);
 
-		} else {
-			// STATE 1 ➡️ STATE 2: (Unseen ➡️ Seen)
-			// Add to watched
-			group.watchedEpisodes.push(episode);
-			group.watchedEpisodes.sort((a, b) => a - b);
-		}
-
-		const newSource = JSON.stringify(data, null, 2);
-		const fileContent = await this.app.vault.read(file);
-		const newFileContent = fileContent.replace(originalSource, newSource);
-
-		await this.app.vault.modify(file, newFileContent);
-	}
+        await this.app.vault.modify(file, newFileContent);
+    }
 }

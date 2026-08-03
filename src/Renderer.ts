@@ -8,8 +8,9 @@ export function renderTracker(
     data: TrackerData, 
     ctx: MarkdownPostProcessorContext,
     settings: TvTrackerSettings,
-    onUpdate: (groupIndex: number, episode: number, container: HTMLElement) => void,
-    onEdit: (currentData: TrackerData) => void // New callback for the edit button
+    // Add isBulkWatch parameter to the callback
+    onUpdate: (groupIndex: number, episode: number, container: HTMLElement, isBulkWatch?: boolean) => void,
+    onEdit: (currentData: TrackerData) => void 
 ) {
     let maxEpisodes = 0;
     let hasGhostData = false;
@@ -22,14 +23,14 @@ export function renderTracker(
 
     const container = el.createEl("div", { cls: "tv-tracker-container" });
     
-    // Create a header bar for the Edit Button
+    // Header Bar & Edit Button
     const headerBar = container.createEl("div", { cls: "tv-tracker-header-bar" });
     const editBtn = headerBar.createEl("button", { text: "⚙️ Edit", cls: "tv-tracker-edit-btn" });
-    editBtn.addEventListener("click", () => {
-        onEdit(data);
-    });
+    editBtn.addEventListener("click", () => onEdit(data));
 
-    const table = container.createEl("table", { cls: "tv-tracker-table" });
+    // Wrap the table in a new div so only the table scrolls horizontally
+    const tableWrapper = container.createEl("div", { cls: "tv-tracker-table-wrapper" });
+    const table = tableWrapper.createEl("table", { cls: "tv-tracker-table" });
 
     // Header
     const thead = table.createEl("thead");
@@ -74,8 +75,29 @@ export function renderTracker(
                     cls: "tv-tracker-checkbox" 
                 });
                 
+                // Long-Press Logic Setup
+                let longPressTimer: NodeJS.Timeout;
+                let isLongPress = false;
+
+                // Detect when user touches or clicks down
+                box.addEventListener("pointerdown", () => {
+                    isLongPress = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        onUpdate(groupIndex, ep, container, true); // bulk watch = true
+                    }, 600); // 600ms hold time
+                });
+
+                // Clear the timer if they let go early or drag their finger away
+                const cancelLongPress = () => clearTimeout(longPressTimer);
+                box.addEventListener("pointerup", cancelLongPress);
+                box.addEventListener("pointerleave", cancelLongPress);
+                box.addEventListener("pointercancel", cancelLongPress);
+
+                // Normal click (only fires if it wasn't a long press)
                 box.addEventListener("click", () => {
-                    onUpdate(groupIndex, ep, container);
+                    if (isLongPress) return; // Ignore click if we already triggered the bulk action
+                    onUpdate(groupIndex, ep, container, false);
                 });
             } else {
                 td.createEl("span", { text: "-", cls: "tv-tracker-empty" });
