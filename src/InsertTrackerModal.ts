@@ -14,7 +14,7 @@ export class InsertTrackerModal extends Modal {
 
     onOpen() {
         const { contentEl } = this;
-        contentEl.createEl("h2", { text: "Create TV & Media Tracker" });
+        contentEl.createEl("h2", { text: "Create TV and Media Tracker" });
 
         new Setting(contentEl)
             .setName("Tracker Title")

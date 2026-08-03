@@ -1,4 +1,4 @@
-# Obsidian TV & Media Tracker
+# Obsidian TV and Media Tracker
 
 ![Obsidian Downloads](https://img.shields.io/badge/Obsidian-Plugin-7A3EE8.svg?logo=obsidian)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
@@ -50,7 +50,7 @@ Made a mistake or starting a new season? Use the built-in visual editor to renam
 *(Pending approval in the official Obsidian directory)*
 1. Go to **Settings > Community Plugins** in Obsidian.
 2. Turn off Safe Mode.
-3. Click **Browse** and search for "TV & Media Tracker".
+3. Click **Browse** and search for "TV and Media Tracker".
 4. Install and enable the plugin.
 
 **Manual Installation**

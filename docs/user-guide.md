@@ -1,6 +1,6 @@
-# User Guide: TV & Media Tracker
+# User Guide: TV and Media Tracker
 
-Welcome to the detailed user guide! This document explains how to get the most out of the TV & Media Tracker plugin.
+Welcome to the detailed user guide! This document explains how to get the most out of the TV and Media Tracker plugin.
 
 ## Interacting with the Tracker
 
@@ -23,7 +23,7 @@ You never have to write JSON manually. Every tracker has a sticky **⚙️ Edit*
 
 Don't like the default checkboxes? You can change them globally!
 1. Open Obsidian **Settings**.
-2. Navigate to **TV & Media Tracker** under Community Plugins.
+2. Navigate to **TV and Media Tracker** under Community Plugins.
 3. Input your preferred emojis (or text characters) for:
    * **Watched Emoji** (Default: ✅)
    * **Unwatched Emoji** (Default: ⬜)

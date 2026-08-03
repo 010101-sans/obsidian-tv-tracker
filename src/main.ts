@@ -14,7 +14,7 @@ export default class TvTrackerPlugin extends Plugin {
     private scrollStates = new Map<string, number>(); 
     
     async onload() {
-        console.log("Loading TV & Media Tracker plugin");
+        console.log("Loading TV and Media Tracker plugin");
         await this.loadSettings();
         this.addSettingTab(new TvTrackerSettingTab(this.app, this));
 
@@ -37,7 +37,7 @@ export default class TvTrackerPlugin extends Plugin {
     }
 
     onunload() {
-        console.log("Unloading TV & Media Tracker plugin");
+        console.log("Unloading TV and Media Tracker plugin");
     }
 
     async loadSettings() {

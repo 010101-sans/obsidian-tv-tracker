@@ -1,6 +1,6 @@
 # Developer Guide
 
-Thank you for your interest in contributing to the **TV & Media Tracker**! This plugin is built with modern web technologies and strictly adheres to the Obsidian API.
+Thank you for your interest in contributing to the **TV and Media Tracker**! This plugin is built with modern web technologies and strictly adheres to the Obsidian API.
 
 ## Tech Stack
 * **Language:** TypeScript

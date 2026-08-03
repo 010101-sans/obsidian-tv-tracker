@@ -26,7 +26,7 @@ export class TvTrackerSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'TV & Media Tracker Settings' });
+        containerEl.createEl('h2', { text: 'TV and Media Tracker Settings' });
 
         new Setting(containerEl)
             .setName('Watched Emoji')
