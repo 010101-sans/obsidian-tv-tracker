@@ -1,4 +1,4 @@
-// settings.ts
+// src/settings.ts
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import TvTrackerPlugin from './main';
 
@@ -11,7 +11,7 @@ export interface TvTrackerSettings {
 export const DEFAULT_SETTINGS: TvTrackerSettings = {
     watchedEmoji: '✅',
     unwatchedEmoji: '⬜',
-    skippedEmoji: '❌',
+    skippedEmoji: '❌'
 };
 
 export class TvTrackerSettingTab extends PluginSettingTab {
@@ -26,38 +26,38 @@ export class TvTrackerSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'TV and Media Tracker Settings' });
+        // Fix for heading error
+        new Setting(containerEl)
+            .setName("TV & Media Tracker Settings")
+            .setHeading();
 
         new Setting(containerEl)
             .setName('Watched Emoji')
-            .setDesc('The character displayed when an episode is marked as watched.')
+            .setDesc('Emoji used to represent watched episodes.')
             .addText(text => text
-                .setPlaceholder('✅')
                 .setValue(this.plugin.settings.watchedEmoji)
                 .onChange(async (value) => {
-                    this.plugin.settings.watchedEmoji = value || DEFAULT_SETTINGS.watchedEmoji;
+                    this.plugin.settings.watchedEmoji = value || '✅';
                     await this.plugin.saveSettings();
                 }));
 
         new Setting(containerEl)
             .setName('Unwatched Emoji')
-            .setDesc('The character displayed for an unwatched episode.')
+            .setDesc('Emoji used to represent unwatched episodes.')
             .addText(text => text
-                .setPlaceholder('⬜')
                 .setValue(this.plugin.settings.unwatchedEmoji)
                 .onChange(async (value) => {
-                    this.plugin.settings.unwatchedEmoji = value || DEFAULT_SETTINGS.unwatchedEmoji;
+                    this.plugin.settings.unwatchedEmoji = value || '⬜';
                     await this.plugin.saveSettings();
                 }));
 
         new Setting(containerEl)
-            .setName('Skipped / Filler Emoji')
-            .setDesc('The character displayed for skipped or filler episodes.')
+            .setName('Skipped Emoji')
+            .setDesc('Emoji used to represent skipped/filler episodes.')
             .addText(text => text
-                .setPlaceholder('❌')
                 .setValue(this.plugin.settings.skippedEmoji)
                 .onChange(async (value) => {
-                    this.plugin.settings.skippedEmoji = value || DEFAULT_SETTINGS.skippedEmoji;
+                    this.plugin.settings.skippedEmoji = value || '❌';
                     await this.plugin.saveSettings();
                 }));
     }

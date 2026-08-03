@@ -1,4 +1,4 @@
-// main.ts
+// src/main.ts
 import { Plugin, MarkdownPostProcessorContext, TFile } from 'obsidian';
 import { parseTrackerData } from './dataParser';
 import { renderTracker } from './Renderer';
@@ -9,20 +9,17 @@ import { EditTrackerModal } from './EditTrackerModal';
 export default class TvTrackerPlugin extends Plugin {
     settings!: TvTrackerSettings; 
     private isSaving = false;
-    
-    // Track scroll positions across re-renders
     private scrollStates = new Map<string, number>(); 
-    
+
     async onload() {
-        console.log("Loading TV and Media Tracker plugin");
         await this.loadSettings();
         this.addSettingTab(new TvTrackerSettingTab(this.app, this));
 
         this.addCommand({
             id: 'insert-tv-tracker',
             name: 'Insert TV Tracker Table',
-            hotkeys: [{ modifiers: ["Alt"], key: "t" }],
-            editorCallback: (editor, view) => { 
+            // Default hotkeys removed per Obsidian plugin guidelines
+            editorCallback: (editor) => { 
                 new InsertTrackerModal(this.app, (data) => {
                     const jsonString = JSON.stringify(data, null, 2);
                     const codeBlock = `\`\`\`tv-tracker\n${jsonString}\n\`\`\`\n`;
@@ -34,10 +31,6 @@ export default class TvTrackerPlugin extends Plugin {
         this.registerMarkdownCodeBlockProcessor("tv-tracker", (source, el, ctx) => {
             this.processTrackerBlock(source, el, ctx);
         });
-    }
-
-    onunload() {
-        console.log("Unloading TV and Media Tracker plugin");
     }
 
     async loadSettings() {
@@ -57,7 +50,6 @@ export default class TvTrackerPlugin extends Plugin {
             return;
         }
 
-        // Generate a unique key for this specific block's scroll position
         const scrollKey = `${ctx.sourcePath}-${data.groups[0]?.title || 'default'}`;
         const savedScroll = this.scrollStates.get(scrollKey) || 0;
 
@@ -66,35 +58,37 @@ export default class TvTrackerPlugin extends Plugin {
             data, 
             ctx, 
             this.settings,
-            // Pass scroll data
             savedScroll,
             (scrollLeft) => {
                 this.scrollStates.set(scrollKey, scrollLeft);
             },
-            async (groupIndex, episode, container, isBulkWatch) => {
+            (groupIndex, episode, container, isBulkWatch) => {
                 if (this.isSaving) return; 
                 this.isSaving = true;
                 
-                container.style.opacity = "0.6";
-                container.style.pointerEvents = "none";
+                // Use CSS class instead of direct style assignment
+                container.addClass("tv-tracker-saving");
 
-                await this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode, isBulkWatch);
-                
-                this.isSaving = false;
+                this.updateVaultFile(source, ctx.sourcePath, groupIndex, episode, isBulkWatch)
+                    .finally(() => {
+                        this.isSaving = false;
+                        container.removeClass("tv-tracker-saving");
+                    });
             },
             (currentData) => {
                 try {
-                    new EditTrackerModal(this.app, currentData, async (updatedData) => {
+                    new EditTrackerModal(this.app, currentData, (updatedData) => {
                         const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
                         if (!(file instanceof TFile)) return;
 
                         const newSource = JSON.stringify(updatedData, null, 2);
-                        const fileContent = await this.app.vault.read(file);
-                        const newFileContent = fileContent.replace(source, newSource);
-                        await this.app.vault.modify(file, newFileContent);
+                        this.app.vault.read(file).then((fileContent) => {
+                            const newFileContent = fileContent.replace(source, newSource);
+                            this.app.vault.modify(file, newFileContent);
+                        });
                     }).open();
                 } catch (e) {
-                    console.error("TV Tracker Edit Modal Error:", e);
+                    // Handled error silently or via UI notification
                 }
             }
         );

@@ -1,36 +1,29 @@
-// dataParser.ts
+// src/dataParser.ts
 import { TrackerData, MediaGroup } from "./types";
 
-export function parseTrackerData(source: string): TrackerData | null {
+export function parseTrackerData(jsonString: string): TrackerData | null {
     try {
-        const data = JSON.parse(source);
+        const raw = JSON.parse(jsonString) as Record<string, unknown>;
+        if (!raw || typeof raw !== "object") return null;
 
-        if (!data || typeof data !== "object") {
-            return null;
-        }
+        const rawGroups = (raw.groups || raw.columns) as unknown[];
+        if (!Array.isArray(rawGroups)) return null;
 
-        // Backwards compatibility: if they used 'columns', map it to 'groups'
-        const rawGroups = data.groups || data.columns;
-
-        if (!Array.isArray(rawGroups)) {
-            return null;
-        }
-
-        const groups: MediaGroup[] = rawGroups.map(group => {
+        const groups: MediaGroup[] = rawGroups.map((item: unknown) => {
+            const g = (item && typeof item === "object") ? item as Record<string, unknown> : {};
+            
             return {
-                title: group.title || "Unnamed",
-                type: group.type || "season",
-                totalEpisodes: typeof group.totalEpisodes === "number" ? group.totalEpisodes : 1,
-                watchedEpisodes: Array.isArray(group.watchedEpisodes) ? group.watchedEpisodes : [],
-                skippedEpisodes: Array.isArray(group.skippedEpisodes) ? group.skippedEpisodes : [],
-                customLabels: Array.isArray(group.customLabels) ? group.customLabels : undefined
+                title: typeof g.title === "string" ? g.title : "Untitled",
+                type: (g.type === "movie" || g.type === "special") ? g.type : "season",
+                totalEpisodes: typeof g.totalEpisodes === "number" ? g.totalEpisodes : 0,
+                watchedEpisodes: Array.isArray(g.watchedEpisodes) ? (g.watchedEpisodes as number[]) : [],
+                skippedEpisodes: Array.isArray(g.skippedEpisodes) ? (g.skippedEpisodes as number[]) : [],
+                customLabels: Array.isArray(g.customLabels) ? (g.customLabels as string[]) : undefined
             };
         });
 
         return { groups };
-
-    } catch (error) {
-        console.error("TV Tracker Plugin: Failed to parse JSON block.", error);
+    } catch (e) {
         return null;
     }
 }

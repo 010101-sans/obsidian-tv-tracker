@@ -1,4 +1,4 @@
-// Renderer.ts
+// src/Renderer.ts
 import { TrackerData } from "./types";
 import { MarkdownPostProcessorContext } from "obsidian";
 import { TvTrackerSettings } from "./settings";
@@ -8,8 +8,8 @@ export function renderTracker(
     data: TrackerData, 
     ctx: MarkdownPostProcessorContext,
     settings: TvTrackerSettings,
-    savedScroll: number, // New
-    onScroll: (scrollLeft: number) => void, // New
+    savedScroll: number,
+    onScroll: (scrollLeft: number) => void,
     onUpdate: (groupIndex: number, episode: number, container: HTMLElement, isBulkWatch?: boolean) => void,
     onEdit: (currentData: TrackerData) => void 
 ) {
@@ -24,30 +24,24 @@ export function renderTracker(
 
     const container = el.createEl("div", { cls: "tv-tracker-container" });
     
-    // Header Bar & Edit Button
     const headerBar = container.createEl("div", { cls: "tv-tracker-header-bar" });
     const editBtn = headerBar.createEl("button", { text: "Edit", cls: "tv-tracker-edit-btn" });
     editBtn.addEventListener("click", () => onEdit(data));
 
-    // Wrap the table in a new div so only the table scrolls horizontally
     const tableWrapper = container.createEl("div", { cls: "tv-tracker-table-wrapper" });
     const table = tableWrapper.createEl("table", { cls: "tv-tracker-table" });
 
-    // Header
-    const thead = table.createEl("thead");
-    const headerRow = thead.createEl("tr");
-    headerRow.createEl("th", { text: "Ep", cls: "tv-tracker-ep-col" });
-
-    // Restore scroll position seamlessly
-    setTimeout(() => {
+    window.setTimeout(() => {
         if (tableWrapper) tableWrapper.scrollLeft = savedScroll;
     }, 50);
 
-    // Save scroll position to memory as user scrolls
     tableWrapper.addEventListener("scroll", () => {
         onScroll(tableWrapper.scrollLeft);
     });
 
+    const thead = table.createEl("thead");
+    const headerRow = thead.createEl("tr");
+    headerRow.createEl("th", { text: "Ep", cls: "tv-tracker-ep-col" });
 
     data.groups.forEach(group => {
         const th = headerRow.createEl("th");
@@ -64,7 +58,6 @@ export function renderTracker(
         }
     });
 
-    // Body
     const tbody = table.createEl("tbody");
 
     for (let ep = 1; ep <= maxEpisodes; ep++) {
@@ -87,28 +80,24 @@ export function renderTracker(
                     cls: "tv-tracker-checkbox" 
                 });
                 
-                // Long-Press Logic Setup
-                let longPressTimer: NodeJS.Timeout;
+                let longPressTimer: number;
                 let isLongPress = false;
 
-                // Detect when user touches or clicks down
                 box.addEventListener("pointerdown", () => {
                     isLongPress = false;
-                    longPressTimer = setTimeout(() => {
+                    longPressTimer = window.setTimeout(() => {
                         isLongPress = true;
-                        onUpdate(groupIndex, ep, container, true); // bulk watch = true
-                    }, 600); // 600ms hold time
+                        onUpdate(groupIndex, ep, container, true);
+                    }, 600);
                 });
 
-                // Clear the timer if they let go early or drag their finger away
-                const cancelLongPress = () => clearTimeout(longPressTimer);
+                const cancelLongPress = () => window.clearTimeout(longPressTimer);
                 box.addEventListener("pointerup", cancelLongPress);
                 box.addEventListener("pointerleave", cancelLongPress);
                 box.addEventListener("pointercancel", cancelLongPress);
 
-                // Normal click (only fires if it wasn't a long press)
                 box.addEventListener("click", () => {
-                    if (isLongPress) return; // Ignore click if we already triggered the bulk action
+                    if (isLongPress) return;
                     onUpdate(groupIndex, ep, container, false);
                 });
             } else {

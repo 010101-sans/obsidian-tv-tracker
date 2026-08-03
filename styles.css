@@ -248,3 +248,21 @@ If your plugin does not need CSS, delete this file.
     font-size: 1.2em;
     user-select: none;
 }
+
+.tv-tracker-saving {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Updated without !important */
+.tv-tracker-is-dragging {
+    opacity: 0.4;
+    border: 2px dashed var(--interactive-accent);
+}
+
+.tv-tracker-drag-over {
+    transform: scale(1.02);
+    border: 2px solid var(--interactive-accent);
+    background-color: var(--background-modifier-hover);
+    transition: all 0.15s ease;
+}
